@@ -1,0 +1,34 @@
+stages :
+  - build
+  - test
+  - sonarqube-check
+  - deploy
+
+build :
+  stage : build
+  script:
+    - ./gradlew assemble
+
+test :
+  stage : test
+  script:
+    - ./gradlew test
+
+sonarqube-check :
+  stage: sonarqube-check
+  script:
+    - ./gradlew test jacocoTestReport sonar
+
+deploy_to_local:
+  stage: deploy
+  script:
+    - docker stop clip-fade-backend-staging || true
+    - docker rm clip-fade-backend-staging || true
+#    - docker build -t clip-fade-backend .
+    - docker run -d -p 8090:8080 --net=docker_clip_fade_network_staging --env spring_profiles_active=staging --name=clip-fade-backend-staging clip-fade-backend
+  only:
+    - main
+    - develop
+  dependencies:
+    - build
+  when: always

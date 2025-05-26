@@ -1,0 +1,79 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.3.3'
+	id 'io.spring.dependency-management' version '1.1.6'
+	id "org.sonarqube" version "5.1.0.4882"
+	id "jacoco"
+}
+
+group = 'nl.fontys.s3.clipFadeApplication'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	//ORM
+	implementation 'org.hibernate:hibernate-core:6.2.0.Final'
+	implementation 'javax.persistence:javax.persistence-api:2.2'
+
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+
+	//DB
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-mysql'
+	implementation 'mysql:mysql-connector-java:8.0.33'
+	testRuntimeOnly 'com.h2database:h2'
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'mysql:mysql-connector-java'
+
+	//Websocket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+	finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+	reports {
+		xml.required = true
+	}
+}
+
+sonar {
+	properties {
+		property "sonar.projectKey", "I522269_barbershop-project_7dcf0faa-13ea-45ef-a037-69bb9715ff7a"
+		property "sonar.projectName", "barbershop-project"
+		property "sonar.qualitygate.wait", true
+		property "sonar.token", "sqp_a44019d45e04f1313a9cb1ed852fac17fe8787c4"
+		property "sonar.inclusions", "**/business/impl/**"
+	}
+}
